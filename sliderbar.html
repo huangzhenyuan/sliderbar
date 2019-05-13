@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>volume bar</title>
+	<script src="./Vue.min.js"></script>
+	<style>
+	*{
+        margin:0;
+        padding:0;
+    } 
+	#volume-bar{
+        height: 20px;
+        border: solid pink;
+        position: relative;
+        margin-left:300px;
+        margin-top: 100px;
+        background: #ddd;
+        cursor:pointer;
+	}
+    #volume-bar div:nth-child(1){
+        height: 20px;
+        position: absolute;
+        background: orange;
+        cursor:pointer;
+    }
+    #volume-bar div:nth-child(2){
+        height: 50px;
+        border: 9px solid pink;
+        border-width: 10px 5px 3px 8px;
+        padding: 1px 3px 4px 2px;
+        position: absolute;
+        top: -24.5px;
+        background: red;
+        cursor:pointer;
+    }
+    </style>
+</head>
+<body>
+	<div id="app">
+		<sliderbar id="volume-bar" :sliderwidth="sliderW" :sliderleft="sliderF" :style='{width:sliderBarBaseW,borderWidth:sliderBarBaseBW,padding:sliderBarBaseP}' ></sliderbar>
+	</div>
+	<script>
+		Vue.component('sliderbar',{
+			props:['sliderwidth','sliderleft'],
+			template:"<div ref='sliderBarBase' @click.once='initFunction' @click='sliderBarBaseFunction'>"+
+			              "<div ref='strip'></div>"+
+			              "<div ref='slider' :style='{width:sliderwidth,left:sliderleft}' @mousedown.once='initFunction' @mousedown='sliderFunction' @mousemove='lposFunction' @mouseup='judgeFunction' @click='sliderStopPropagation'></div>"+
+			          '</div>',
+  			data: function () {
+    			return {
+    				judge:false,
+    				mxcmslp:0,
+    				sliderLeft:'',
+    				sliderinitwidth:'',
+    				sliderbarbaseinitwidth:'',
+    				sliderbarbaseinitborderwidthleft:'',
+    				sliderbarbaseinitborderwidthright:'',
+    				sliderbarbaseinitpaddingleft:''
+    			}
+  			},
+  			watch:{
+  				sliderLeft:function(val){
+  					this.$refs.strip.style.width=val;
+  					if(val.substr(0,val.length-2)<=0){
+  						this.$refs.strip.style.width=0
+  					}
+  				}
+  			},
+			methods:{
+				initFunction:function(){
+					this.sliderinitwidth=this.$refs.slider.offsetWidth;
+					this.sliderbarbaseinitwidth=this.$refs.sliderBarBase.offsetWidth;
+					if(this.$refs.sliderBarBase.style.borderWidth!=''){
+						this.sliderbarbaseinitborderwidthleft=this.$refs.sliderBarBase.style.borderWidth.split("px")[3];
+						this.sliderbarbaseinitborderwidthright=this.$refs.sliderBarBase.style.borderWidth.split("px ")[1];
+					};
+					if(this.$refs.sliderBarBase.style.padding!=''){
+						this.sliderbarbaseinitpaddingleft=this.$refs.sliderBarBase.style.paddingLeft.substr(0,this.$refs.sliderBarBase.style.paddingLeft.length-2);
+					};
+					this.initFunction=function(){};					
+				},
+				mxcmslpFunction:function(e){
+					var e=e||window.event;
+					this.judge=true;
+					var lpos=this.$refs.slider.style.left;
+					this.mxcmslp=parseInt(e.clientX-lpos.substr(0,lpos.length-2));
+				},
+				lposFunction:function(e){
+					e.preventDefault();
+					if(this.judge){
+		                var e=e||window.event;
+						this.$refs.slider.style.left=e.clientX-this.mxcmslp+'px';
+						var lpos=this.$refs.slider.style.left;
+
+                    	if(lpos.substr(0,lpos.length-2)<this.sliderinitwidth/-2){
+                        	this.$refs.slider.style.left=this.sliderinitwidth/-2+'px';
+                    	};
+                    	if(lpos.substr(0,lpos.length-2)>this.sliderbarbaseinitwidth-this.sliderbarbaseinitborderwidthleft-this.sliderbarbaseinitborderwidthright-this.sliderinitwidth/2){
+                        	this.$refs.slider.style.left=this.sliderbarbaseinitwidth-this.sliderbarbaseinitborderwidthleft-this.sliderbarbaseinitborderwidthright-this.sliderinitwidth/2+'px';
+                    	}; 
+                    	this.sliderLeft=this.$refs.slider.style.left
+					}
+				},
+				sliderFunction:function(e){
+					var e=e||window.event;
+					this.mxcmslpFunction(e);
+					document.addEventListener("mousemove",this.lposFunction);
+					document.addEventListener("mouseup",this.judgeFunction);
+				},
+				judgeFunction:function(){
+					this.judge=false;
+					document.removeEventListener("mousemove",this.lposFunction);
+					document.removeEventListener("mouseup",this.judgeFunction);
+				},
+				sliderStopPropagation:function(e){
+                	var e=e||window.event;
+                	e.stopPropagation()
+				},
+				sliderBarBaseFunction:function(e){
+					var e=e||window.event;
+					var element=e.target||e.srcElement;
+					if(element.id=='volume-bar'){
+						this.$refs.slider.style.left=e.clientX-element.getBoundingClientRect().left-this.sliderinitwidth/2-this.sliderbarbaseinitborderwidthleft+'px';
+					}else{
+						this.$refs.slider.style.left=e.clientX-element.getBoundingClientRect().left-this.sliderinitwidth/2-this.sliderbarbaseinitpaddingleft/-1+'px';
+					}
+					this.sliderLeft=this.$refs.slider.style.left;
+				}
+			}			
+		})
+		var vm=new Vue({
+			el:'#app',
+  			data: {
+				sliderW: '45px',
+				sliderF: '-31.5px',
+				sliderBarBaseW: '288px',
+				sliderBarBaseBW: '10px 13px 3px 27px',
+				sliderBarBaseP: '4px 43px 2px 15px',
+  			}
+		})
+	</script>
+</body>
+</html>
