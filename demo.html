@@ -8,22 +8,22 @@
         margin:0;
         padding:0;
     }   
-    #app{
+    #sliderbar{
         height: 20px;
         width:400px;
         position: relative;
-        margin-left:400px;
         margin-top: 100px;
+        margin-left:400px;
         background: #ddd;
         cursor:pointer;
     }
-    #volume-bar-strip{
+    #strip{
         height: 20px;
         position: absolute;
         background: orange;
         cursor:pointer;
     }
-    #volume-bar-slider{
+    #slider{
         height: 50px;
         width:50px;
         position: absolute;
@@ -34,75 +34,78 @@
     }
     </style>
     <script>
+        /*
+        变量judge：用于判断函数mxcmslpFunction执行是否;
+        变量mxcmslp：mouse x coordinates minus slider left positioning的缩写，用于存放鼠标x坐标减去slider的左定位的值;
+        函数mxcmslpFunction：用于计算鼠标x坐标减去slider的左定位的值;
+        函数lposFunction：用于计算鼠标x坐标减去mxcmslp的值，并将值赋给slider的左定位和strip的宽,设置slider左定位的最小值和最大值;
+         */
         window.onload=function(){
-            var app=document.querySelector('#app');
-            var volumeBarSlider=document.querySelector('#volume-bar-slider');
-            var volumeDarStrip=document.querySelector('#volume-bar-strip');
-            var index=false;
-            var x1=0;
-            //鼠标x坐标减volumeBarSlider的left
+            var sliderbar=document.querySelector('#sliderbar');
+            var slider=document.querySelector('#slider');
+            var strip=document.querySelector('#strip');
+            var judge=false;
+            var mxcmslp=0;
             function mxcmslpFunction(e){
-                index=true;              //鼠标按下才能触发onmousemove方法
+                judge=true;              
                 var e=e||window.event;
-                var x=e.clientX;      //鼠标点击的坐标值，x
-                var left= volumeBarSlider.style.left;
-                left=left.substr(0,left.length-2);   //去掉px
-                x1=parseInt(x-left);
+                var left= slider.style.left;
+                left=left.substr(0,left.length-2);   
+                mxcmslp=parseInt(e.clientX-left);
             };  
-            //volumeBarSlider的left
             function lposFunction(e){
             	e.preventDefault();
-                if(index){
+                if(judge){
                     var e=e||window.event;
-                    volumeBarSlider.style.left=e.clientX-x1+'px';
-                    var lpos=volumeBarSlider.style.left;
-                    volumeDarStrip.style.width=lpos;
+                    slider.style.left=e.clientX-mxcmslp+'px';
+                    var lpos=slider.style.left;
+                    strip.style.width=lpos;
                     if(lpos.substr(0,lpos.length-2)<-25){
-                        volumeBarSlider.style.left="-25px";
-                        volumeDarStrip.style.width=0;
+                        slider.style.left="-25px";
+                        strip.style.width=0;
                     };
                     if(lpos.substr(0,lpos.length-2)>375){
-                        volumeBarSlider.style.left='375px';
-                        volumeDarStrip.style.width='375px';
+                        slider.style.left='375px';
+                        strip.style.width='375px';
                     };  
                 }
             };
-            volumeBarSlider.addEventListener("mousedown",function(e){
+            slider.addEventListener("mousedown",function(e){
                 var e=e||window.event;
                 mxcmslpFunction(e);
                 document.addEventListener("mousemove",lposFunction);       
             });
-            volumeBarSlider.addEventListener("mousemove",lposFunction);
-            volumeBarSlider.onmouseup=function(){
+            slider.addEventListener("mousemove",lposFunction);
+            slider.onmouseup=function(){
                 document.removeEventListener("mousemove",lposFunction);
-                index=false;
+                judge=false;
             };
             document.onmouseup=function(){
-                if(index){
-                    volumeBarSlider.onmouseup();      //类似可以index=0; 
+                if(judge){
+                    slider.onmouseup();       
                 }                             
             }
-            volumeBarSlider.onclick=function(e){
+            slider.onclick=function(e){
                 var e=e||window.event;
                 e.stopPropagation();
             }
-            app.onclick=function(e){
+            sliderbar.onclick=function(e){
                 var e=e||window.event;              
                 var element=e.target||e.srcElement;
-                volumeBarSlider.style.left=e.clientX-element.getBoundingClientRect().left-25+'px';
-                var lpos=volumeBarSlider.style.left;
-                volumeDarStrip.style.width=lpos;
+                slider.style.left=e.clientX-element.getBoundingClientRect().left-25+'px';
+                var lpos=slider.style.left;
+                strip.style.width=lpos;
                 if(lpos.substr(0,lpos.length-2)<0){
-                	volumeDarStrip.style.width=0
+                	strip.style.width=0
                 }
             }
         }
     </script> 
 </head>
 <body>
-	<div id="app">
-		<div id="volume-bar-strip"></div>
-		<div id="volume-bar-slider" style="left: -25px"></div>
+	<div id="sliderbar">
+		<div id="strip"></div>
+		<div id="slider" style="left: -25px"></div>
 	</div>
 </body>
 </html>
