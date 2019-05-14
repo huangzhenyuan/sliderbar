@@ -73,7 +73,7 @@
             slider.addEventListener("mousedown",function(e){
                 var e=e||window.event;
                 mxcmslpFunction(e);
-                document.addEventListener("mousemove",lposFunction);       
+                document.addEventListener("mousemove",lposFunction);//解决拖动slider过程中鼠标移出slider后无法拖动的问题    
             });
             slider.addEventListener("mousemove",lposFunction);
             slider.onmouseup=function(){
