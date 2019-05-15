@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>slider bar</title>
     <style>
     *{
         margin:0;
@@ -35,9 +35,9 @@
     </style>
     <script>
         /*
-        变量judge：用于判断函数mxcmslpFunction执行是否;
-        变量mxcmslp：mouse x coordinates minus slider left positioning的缩写，用于存放鼠标x坐标减去slider的左定位的值;
-        函数mxcmslpFunction：用于计算鼠标x坐标减去slider的左定位的值;
+        变量judge：用于判断函数mxcmslpFunction是否执行过;
+        变量mxcmslp：mouse x coordinates minus slider left positioning的缩写，用于存放鼠标x坐标减去slider的左定位后的值;
+        函数mxcmslpFunction：用于计算鼠标x坐标减去slider的左定位后的值;
         函数lposFunction：用于计算鼠标x坐标减去mxcmslp的值，并将值赋给slider的左定位和strip的宽,设置slider左定位的最小值和最大值;
          */
         window.onload=function(){

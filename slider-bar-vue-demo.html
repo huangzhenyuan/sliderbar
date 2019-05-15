@@ -2,14 +2,14 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>volume bar</title>
+	<title>slider bar</title>
 	<script src="./Vue.min.js"></script>
 	<style>
 	*{
         margin:0;
         padding:0;
     } 
-	#volume-bar{
+	#sliderbar{
         height: 20px;
         border: solid pink;
         position: relative;
@@ -18,13 +18,13 @@
         background: #ddd;
         cursor:pointer;
 	}
-    #volume-bar div:nth-child(1){
+    #sliderbar div:nth-child(1){
         height: 20px;
         position: absolute;
         background: orange;
         cursor:pointer;
     }
-    #volume-bar div:nth-child(2){
+    #sliderbar div:nth-child(2){
         height: 50px;
         border: 9px solid pink;
         border-width: 10px 5px 3px 8px;
@@ -37,10 +37,33 @@
     </style>
 </head>
 <body>
+	<!-- 
+		sliderwidth:用于设置子组件ref='slider'的宽;
+		sliderleft:用于设置子组件ref='slider'的左定位;
+	 -->
 	<div id="app">
-		<sliderbar id="volume-bar" :sliderwidth="sliderW" :sliderleft="sliderF" :style='{width:sliderBarBaseW,borderWidth:sliderBarBaseBW,padding:sliderBarBaseP}' ></sliderbar>
+		<sliderbar id="sliderbar" :sliderwidth="sliderW" :sliderleft="sliderF" :style='{width:sliderBarBaseW,borderWidth:sliderBarBaseBW,padding:sliderBarBaseP}' ></sliderbar>
 	</div>
 	<script>
+		/*
+		组件方法：
+		initFunction：用于将组件的初始样式的值存储到组件数据中;
+		sliderBarBaseFunction：实现点击组件ref='sliderBarBase'或组件ref='strip'后组件ref='slider'移动到鼠标位置的功能;
+		sliderFunction：解决拖动组件ref='slider'过程中鼠标移出组件ref='slider'后无法拖动的问题;  
+		mxcmslpFunction:用于计算鼠标x坐标减去组件ref='slider'的左定位后的值;
+		lposFunction:用于计算鼠标x坐标减去mxcmslpFunction计算出的值后的值，并将得出的值赋给组件ref='slider'的左定位和组件ref='strip'的宽，实现组件ref='slider'跟随鼠标移动的功能;
+		sliderLeftExtremum：设置组件ref='slider'左定位的最值，以控制组件ref='slider'的移动范围;
+
+		组件数据：
+    	judge:用于判断函数mxcmslpFunction是否执行过;
+    	mxcmsl：用于存储鼠标x坐标减去组件ref='slider'的左定位后的值;
+    	sliderLeft：用于控制组件ref='slider'的宽;
+    	sliderinitwidth：用于存储组件ref='slider'初始的宽;
+    	sliderbarbaseinitwidth：用于存储组件ref='sliderBarBase'初始的宽;
+    	sliderbarbaseinitborderwidthleft：用于存储组件ref='sliderBarBase'初始的左边框;
+    	sliderbarbaseinitborderwidthright：用于存储组件ref='sliderBarBase'初始的右边框;
+    	sliderbarbaseinitpaddingleft：用于存储组件ref='sliderBarBase'初始的左内边距;
+		 */
 		Vue.component('sliderbar',{
 			props:['sliderwidth','sliderleft'],
 			template:"<div ref='sliderBarBase' @click.once='initFunction' @click='sliderBarBaseFunction'>"+
@@ -86,27 +109,29 @@
 					var lpos=this.$refs.slider.style.left;
 					this.mxcmslp=parseInt(e.clientX-lpos.substr(0,lpos.length-2));
 				},
-				lposFunction:function(e){
-					e.preventDefault();
-					if(this.judge){
-		                var e=e||window.event;
-						this.$refs.slider.style.left=e.clientX-this.mxcmslp+'px';
-						var lpos=this.$refs.slider.style.left;
-
-                    	if(lpos.substr(0,lpos.length-2)<this.sliderinitwidth/-2){
-                        	this.$refs.slider.style.left=this.sliderinitwidth/-2+'px';
-                    	};
-                    	if(lpos.substr(0,lpos.length-2)>this.sliderbarbaseinitwidth-this.sliderbarbaseinitborderwidthleft-this.sliderbarbaseinitborderwidthright-this.sliderinitwidth/2){
-                        	this.$refs.slider.style.left=this.sliderbarbaseinitwidth-this.sliderbarbaseinitborderwidthleft-this.sliderbarbaseinitborderwidthright-this.sliderinitwidth/2+'px';
-                    	}; 
-                    	this.sliderLeft=this.$refs.slider.style.left
-					}
-				},
 				sliderFunction:function(e){
 					var e=e||window.event;
 					this.mxcmslpFunction(e);
 					document.addEventListener("mousemove",this.lposFunction);
 					document.addEventListener("mouseup",this.judgeFunction);
+				},
+				sliderLeftExtremum:function(){
+				    var lpos=this.$refs.slider.style.left;
+                    if(lpos.substr(0,lpos.length-2)<this.sliderinitwidth/-2){
+                        this.$refs.slider.style.left=this.sliderinitwidth/-2+'px';
+                    };
+                    if(lpos.substr(0,lpos.length-2)>this.sliderbarbaseinitwidth-this.sliderbarbaseinitborderwidthleft-this.sliderbarbaseinitborderwidthright-this.sliderinitwidth/2){
+                        this.$refs.slider.style.left=this.sliderbarbaseinitwidth-this.sliderbarbaseinitborderwidthleft-this.sliderbarbaseinitborderwidthright-this.sliderinitwidth/2+'px';
+                    }; 					
+				},
+				lposFunction:function(e){
+					e.preventDefault();
+					if(this.judge){
+		                var e=e||window.event;
+						this.$refs.slider.style.left=e.clientX-this.mxcmslp+'px';
+						this.sliderLeftExtremum();
+                    	this.sliderLeft=this.$refs.slider.style.left
+					}
 				},
 				judgeFunction:function(){
 					this.judge=false;
@@ -120,11 +145,12 @@
 				sliderBarBaseFunction:function(e){
 					var e=e||window.event;
 					var element=e.target||e.srcElement;
-					if(element.id=='volume-bar'){
+					if(element.id=='sliderbar'){
 						this.$refs.slider.style.left=e.clientX-element.getBoundingClientRect().left-this.sliderinitwidth/2-this.sliderbarbaseinitborderwidthleft+'px';
 					}else{
 						this.$refs.slider.style.left=e.clientX-element.getBoundingClientRect().left-this.sliderinitwidth/2-this.sliderbarbaseinitpaddingleft/-1+'px';
 					}
+					this.sliderLeftExtremum();
 					this.sliderLeft=this.$refs.slider.style.left;
 				}
 			}			
