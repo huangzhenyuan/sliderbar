@@ -10,12 +10,13 @@
         padding:0;
     } 
 	#sliderbar{
+		width: 288px;
         height: 20px;
         border: solid pink;
-        position: relative;
         margin-left:300px;
         margin-top: 100px;
         background: #ddd;
+        position: relative;
         cursor:pointer;
 	}
     #sliderbar div:nth-child(1){
@@ -42,7 +43,7 @@
 		sliderleft:用于设置子组件ref='slider'的左定位;
 	 -->
 	<div id="app">
-		<sliderbar id="sliderbar" :sliderwidth="sliderW" :sliderleft="sliderF" :style='{width:sliderBarBaseW,borderWidth:sliderBarBaseBW,padding:sliderBarBaseP}' ></sliderbar>
+		<sliderbar id="sliderbar" :sliderwidth="sliderW" :sliderleft="sliderF" :style='sliderBarBaseStyle'></sliderbar>
 	</div>
 	<script>
 		/*
@@ -57,8 +58,8 @@
     	judge:用于判断函数mxcmslpFunction是否执行过;
     	mxcmsl：用于存储鼠标x坐标减去组件ref='slider'的左定位后的值;
     	sliderLeft：用于控制组件ref='slider'的宽;
-    	sliderinitwidth：用于存储组件ref='slider'初始的宽;
-    	sliderbarbaseinitwidth：用于存储组件ref='sliderBarBase'初始的宽;
+    	sliderinitwidth：用于存储组件ref='slider'初始的offsetWidth;
+    	sliderbarbaseinitwidth：用于存储组件ref='sliderBarBase'初始的offsetWidth;
     	sliderbarbaseinitborderwidthleft：用于存储组件ref='sliderBarBase'初始的左边框;
     	sliderbarbaseinitborderwidthright：用于存储组件ref='sliderBarBase'初始的右边框;
     	sliderbarbaseinitpaddingleft：用于存储组件ref='sliderBarBase'初始的左内边距;
@@ -158,9 +159,10 @@
   			data: {
 				sliderW: '45px',
 				sliderF: '-31.5px',
-				sliderBarBaseW: '288px',
-				sliderBarBaseBW: '10px 13px 3px 27px',
-				sliderBarBaseP: '4px 43px 2px 15px',
+				sliderBarBaseStyle: {
+					borderWidth:'10px 13px 3px 27px',
+					padding:'4px 43px 2px 15px'
+				}
   			}
 		})
 	</script>
