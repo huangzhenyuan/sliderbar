@@ -47,7 +47,6 @@
 	<script>
 		/*
 		组件方法：
-		initFunction：用于将组件的初始样式的值存储到组件数据中;
 		sliderBarBaseFunction：实现点击组件ref='sliderBarBase'或组件ref='strip'后组件ref='slider'移动到鼠标位置的功能;
 		sliderFunction：解决拖动组件ref='slider'过程中鼠标移出组件ref='slider'后无法拖动的问题;  
 		mxcmslpFunction:用于计算鼠标x坐标减去组件ref='slider'的左定位后的值;
@@ -66,9 +65,9 @@
 		 */
 		Vue.component('sliderbar',{
 			props:['sliderwidth','sliderleft'],
-			template:"<div ref='sliderBarBase' @click.once='initFunction' @click='sliderBarBaseFunction'>"+
+			template:"<div ref='sliderBarBase' @click='sliderBarBaseFunction'>"+
 			              "<div ref='strip'></div>"+
-			              "<div ref='slider' :style='{width:sliderwidth,left:sliderleft}' @mousedown.once='initFunction' @mousedown='sliderFunction' @mousemove='lposFunction' @mouseup='judgeFunction' @click='sliderStopPropagation'></div>"+
+			              "<div ref='slider' :style='{width:sliderwidth,left:sliderleft}' @mousedown='sliderFunction' @mousemove='lposFunction' @mouseup='judgeFunction' @click='sliderStopPropagation'></div>"+
 			          '</div>',
   			data: function () {
     			return {
@@ -82,6 +81,17 @@
     				sliderbarbaseinitpaddingleft:''
     			}
   			},
+  			mounted: function(){
+				this.sliderinitwidth=this.$refs.slider.offsetWidth;
+				this.sliderbarbaseinitwidth=this.$refs.sliderBarBase.offsetWidth;
+				if(this.$refs.sliderBarBase.style.borderWidth!=''){
+					this.sliderbarbaseinitborderwidthleft=this.$refs.sliderBarBase.style.borderWidth.split("px")[3];
+					this.sliderbarbaseinitborderwidthright=this.$refs.sliderBarBase.style.borderWidth.split("px ")[1];
+				};
+				if(this.$refs.sliderBarBase.style.padding!=''){
+					this.sliderbarbaseinitpaddingleft=this.$refs.sliderBarBase.style.paddingLeft.substr(0,this.$refs.sliderBarBase.style.paddingLeft.length-2);
+				};
+  			},
   			watch:{
   				sliderLeft:function(val){
   					this.$refs.strip.style.width=val;
@@ -91,18 +101,6 @@
   				}
   			},
 			methods:{
-				initFunction:function(){
-					this.sliderinitwidth=this.$refs.slider.offsetWidth;
-					this.sliderbarbaseinitwidth=this.$refs.sliderBarBase.offsetWidth;
-					if(this.$refs.sliderBarBase.style.borderWidth!=''){
-						this.sliderbarbaseinitborderwidthleft=this.$refs.sliderBarBase.style.borderWidth.split("px")[3];
-						this.sliderbarbaseinitborderwidthright=this.$refs.sliderBarBase.style.borderWidth.split("px ")[1];
-					};
-					if(this.$refs.sliderBarBase.style.padding!=''){
-						this.sliderbarbaseinitpaddingleft=this.$refs.sliderBarBase.style.paddingLeft.substr(0,this.$refs.sliderBarBase.style.paddingLeft.length-2);
-					};
-					this.initFunction=function(){};					
-				},
 				mxcmslpFunction:function(e){
 					var e=e||window.event;
 					this.judge=true;
